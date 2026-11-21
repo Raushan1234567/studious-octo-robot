@@ -7,7 +7,7 @@ A Spring Boot REST API for managing tasks. The application uses MySQL to store t
 - Java 17
 - Spring Boot
 - Spring Data JPA
-- MySQL
+- postgre sql
 - Maven
 
 ## Database Configuration
