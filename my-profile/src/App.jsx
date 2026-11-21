@@ -1,39 +1,95 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
+
+const API_URL = "http://localhost:8080/api/tasks";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [taskInput, setTaskInput] = useState("");
 
-  // Add a new task
-  const addTask = () => {
+  // Fetch tasks from backend when the page loads
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error("Failed to fetch tasks");
+
+      const data = await response.json();
+      setTasks(data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  // Add a task to MySQL through the backend
+  const addTask = async () => {
     if (taskInput.trim() === "") return;
 
-    const newTask = {
-      id: Date.now(),
-      title: taskInput,
-      completed: false,
-    };
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: taskInput.trim(),
+          completed: false,
+        }),
+      });
 
-    setTasks([...tasks, newTask]);
-    setTaskInput("");
+      if (!response.ok) throw new Error("Failed to add task");
+
+      const newTask = await response.json();
+      setTasks((previousTasks) => [...previousTasks, newTask]);
+      setTaskInput("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
-  // Mark task as completed or pending
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === id
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
+  // Update task completion in the backend
+  const toggleTask = async (task) => {
+    try {
+      const response = await fetch(`${API_URL}/${task.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: task.title,
+          completed: !task.completed,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update task");
+
+      const updatedTask = await response.json();
+
+      setTasks((previousTasks) =>
+        previousTasks.map((item) =>
+          item.id === task.id ? updatedTask : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
   };
 
-  // Delete a task
-  const deleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+  // Delete task from backend
+  const deleteTask = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete task");
+
+      setTasks((previousTasks) =>
+        previousTasks.filter((task) => task.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const completedCount = tasks.filter(
@@ -53,12 +109,10 @@ function App() {
             <h2>{tasks.length}</h2>
             <p>Total Tasks</p>
           </div>
-
           <div>
             <h2>{completedCount}</h2>
             <p>Completed</p>
           </div>
-
           <div>
             <h2>{tasks.length - completedCount}</h2>
             <p>Pending</p>
@@ -75,7 +129,6 @@ function App() {
               if (e.key === "Enter") addTask();
             }}
           />
-
           <button onClick={addTask}>Add Task</button>
         </div>
 
@@ -91,14 +144,9 @@ function App() {
                   <input
                     type="checkbox"
                     checked={task.completed}
-                    onChange={() => toggleTask(task.id)}
+                    onChange={() => toggleTask(task)}
                   />
-
-                  <span
-                    className={
-                      task.completed ? "completed" : ""
-                    }
-                  >
+                  <span className={task.completed ? "completed" : ""}>
                     {task.title}
                   </span>
                 </label>
