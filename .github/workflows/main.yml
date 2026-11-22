@@ -1,0 +1,23 @@
+
+name: My First GitHub Action
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  first-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print welcome message
+        run: echo "GitHub Actions is working!"
+
+      - name: Print current date
+        run: date
