@@ -46,17 +46,17 @@ jobs:
           cache: maven
 
       - name: Verify backend project
-        run: test -f "BackendSetup/demo (4)/demo/pom.xml"
+        run: test -f "BackendSetup/demo-4/demo/pom.xml"
 
       - name: Maven Build and Test
-        working-directory: BackendSetup/demo (4)/demo
+        working-directory: BackendSetup/demo-4/demo
         run: |
           chmod +x mvnw
           ./mvnw clean verify
 
       # NEW: Build Docker image locally
       - name: Build Backend Docker Image
-        working-directory: BackendSetup/demo (4)/demo
+        working-directory: BackendSetup/demo-4/demo
         run: docker build -t backend-test:ci .
 
       # NEW: Start backend container
