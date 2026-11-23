@@ -1,5 +1,5 @@
 
-package main.java.com.devops.baseline.controller;
+package com.devops.baseline.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
