@@ -112,7 +112,7 @@ jobs:
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
         with:
-          context: BackendSetup/demo (4)/demo
+          context: BackendSetup/demo-4/demo
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:latest
